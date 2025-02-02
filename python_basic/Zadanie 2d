@@ -1,0 +1,6 @@
+def wyswietl_co_drugi(lista_liczb):
+    for i in range(0, len(lista_liczb), 2):
+        print(lista_liczb[i])
+
+
+wyswietl_co_drugi(range(1, 11))  # Liczby od 1 do 10

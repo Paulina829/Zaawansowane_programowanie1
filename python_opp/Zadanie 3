@@ -1,0 +1,36 @@
+class Property:
+    def __init__(self, area, rooms, price, address):
+        self.area = area
+        self.rooms = rooms
+        self.price = price
+        self.address = address
+
+    def __str__(self):
+        return f"Property: {self.area}m², {self.rooms} rooms, {self.price} PLN, Address: {self.address}"
+
+
+class House(Property):
+    def __init__(self, area, rooms, price, address, plot):
+        super().__init__(area, rooms, price, address)
+        self.plot = plot
+
+    def __str__(self):
+        return f"House: {super().__str__()}, Plot size: {self.plot}m²"
+
+
+class Flat(Property):
+    def __init__(self, area, rooms, price, address, floor):
+        super().__init__(area, rooms, price, address)
+        self.floor = floor
+
+    def __str__(self):
+        return f"Flat: {super().__str__()}, Floor: {self.floor}"
+
+
+# Tworzenie obiektów
+house = House(150, 5, 500000, "Main St 10, Warsaw", 300)
+flat = Flat(60, 3, 300000, "Second St 20, Cracow", 2)
+
+# Wyświetlenie obiektów
+print(house)
+print(flat)

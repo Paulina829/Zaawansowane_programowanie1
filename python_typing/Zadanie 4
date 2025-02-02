@@ -1,0 +1,6 @@
+def sprawdz_sume(a, b, c):
+    return (a + b) >= c
+
+
+wynik = sprawdz_sume(4, 6, 10)
+print(wynik)

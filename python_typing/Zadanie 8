@@ -1,0 +1,39 @@
+import requests
+import argparse
+
+class Brewery:
+    def __init__(self, id, name, brewery_type, city, state, country, website_url):
+        self.id = id
+        self.name = name
+        self.brewery_type = brewery_type
+        self.city = city
+        self.state = state
+        self.country = country
+        self.website_url = website_url
+
+    def __str__(self):
+        return f"{self.name} ({self.brewery_type}) - {self.city}, {self.state}, {self.country}. Website: {self.website_url}"
+
+def fetch_breweries(city=None):
+    url = "https://api.openbrewerydb.org/breweries"
+    params = {"per_page": 20}
+    if city:
+        params["by_city"] = city
+    response = requests.get(url, params=params)
+    return response.json()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Fetch breweries by city.")
+    parser.add_argument("--city", type=str, help="City to filter breweries by")
+    args = parser.parse_args()
+
+    breweries_data = fetch_breweries(args.city)
+    brewery_list = [
+        Brewery(
+            b["id"], b["name"], b["brewery_type"], b["city"], b["state"], b["country"], b.get("website_url", "No website")
+        )
+        for b in breweries_data
+    ]
+
+    for brewery in brewery_list:
+        print(brewery)

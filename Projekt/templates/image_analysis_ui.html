@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analiza Obrazów</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        section { margin-bottom: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: blue; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h1> Analiza Obrazów API</h1>
+
+    <!-- Przesyłanie pliku -->
+    <section>
+        <h2> Prześlij Obraz</h2>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="upload-image" name="image" required>
+            <button type="submit">Prześlij</button>
+        </form>
+        <p id="upload-response"></p>
+    </section>
+
+    <!-- Analiza obrazu z URL -->
+    <section>
+        <h2> Analiza obrazu z URL</h2>
+        <form id="url-form">
+            <input type="text" id="image-url" placeholder="Wpisz URL obrazu" required>
+            <button type="submit">Analizuj</button>
+        </form>
+        <p id="url-response"></p>
+    </section>
+
+    <!-- Analiza lokalnego pliku -->
+    <section>
+        <h2> Analiza lokalnego pliku</h2>
+        <form id="local-analyze-form">
+            <input type="text" id="local-path" placeholder="Ścieżka do pliku" required>
+            <button type="submit">Analizuj</button>
+        </form>
+        <p id="local-response"></p>
+    </section>
+
+    <script>
+        const baseUrl = "http://127.0.0.1:5000";  // API działa lokalnie
+
+        async function fetchData(url, method = "GET", body = null, responseElementId) {
+            try {
+                const options = { method };
+                if (body) options.body = body;
+
+                const response = await fetch(url, options);
+                const text = await response.text();  //  pobieramy odpowiedź jako tekst
+
+                let result;
+                try {
+                    result = JSON.parse(text);  // Próbujem sparsować jako JSON
+                } catch (error) {
+                    console.error("❌ Błąd parsowania JSON:", text);
+                    document.getElementById(responseElementId).innerHTML = 
+                        `<span class="error">❌ Błąd: Serwer zwrócił niepoprawny format danych.</span>`;
+                    return;
+                }
+
+                console.log("Response from", url, result);
+
+                if (response.ok) {
+                    document.getElementById(responseElementId).innerHTML = 
+                        `<span class="success">✅ Zadanie utworzone! Task ID: ${result.task_id || "N/A"}</span><br>
+                         <span class="loading">🔄 Wynik analizy pojawi się w terminalu.</span>`;
+                } else {
+                    throw new Error(result.error || "Nieznany błąd");
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById(responseElementId).innerHTML = 
+                    `<span class="error">❌ Błąd: ${error.message}</span>`;
+            }
+        }
+
+        //  Obsługa formularza przesyłania obrazu
+        document.getElementById("upload-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetchData(`${baseUrl}/upload`, "POST", formData, "upload-response");
+        });
+
+        //  Obsługa formularza analizy obrazu z URL
+        document.getElementById("url-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const url = document.getElementById("image-url").value;
+            fetchData(`${baseUrl}/analyze?url=${encodeURIComponent(url)}`, "GET", null, "url-response");
+        });
+
+        //  Obsługa formularza analizy lokalnego pliku
+        document.getElementById("local-analyze-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const path = document.getElementById("local-path").value;
+            fetchData(`${baseUrl}/local-analyze?path=${encodeURIComponent(path)}`, "GET", null, "local-response");
+        });
+
+    </script>
+
+</body>
+</html>

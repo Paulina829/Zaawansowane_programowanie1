@@ -1,0 +1,29 @@
+import requests
+
+class Brewery:
+    def __init__(self, id, name, brewery_type, city, state, country, website_url):
+        self.id = id
+        self.name = name
+        self.brewery_type = brewery_type
+        self.city = city
+        self.state = state
+        self.country = country
+        self.website_url = website_url
+
+    def __str__(self):
+        return f"{self.name} ({self.brewery_type}) - {self.city}, {self.state}, {self.country}. Website: {self.website_url}"
+
+
+response = requests.get("https://api.openbrewerydb.org/breweries?per_page=20")
+breweries_data = response.json()
+
+
+brewery_list = [
+    Brewery(
+        b["id"], b["name"], b["brewery_type"], b["city"], b["state"], b["country"], b.get("website_url", "No website")
+    )
+    for b in breweries_data
+]
+
+for brewery in brewery_list:
+    print(brewery)
