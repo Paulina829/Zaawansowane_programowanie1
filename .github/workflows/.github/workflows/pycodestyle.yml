@@ -1,0 +1,21 @@
+name: PEP8 Code Style Check
+
+on: [push, pull_request]  # Sprawdza kod po każdym pushu i PR
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pobranie repozytorium
+        uses: actions/checkout@v3
+
+      - name: Instalacja Pythona
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Instalacja pycodestyle
+        run: pip install pycodestyle
+
+      - name: Sprawdzenie zgodności z PEP8
+        run: pycodestyle .
